@@ -29,17 +29,6 @@
                     fontFamily: {
                         sans: ['"Noto Sans TC"', 'sans-serif'],
                         orbitron: ['Orbitron', 'sans-serif'],
-                    },
-                    colors: {
-                        dark: '#030305',
-                        surface: '#0d0d14',
-                        cyan: '#00F0FF',
-                        purple: '#7000FF',
-                        magenta: '#FF0055'
-                    },
-                    backgroundImage: {
-                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-                        'tech-gradient': 'linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(112, 0, 255, 0.1) 100%)',
                     }
                 }
             }
@@ -48,141 +37,23 @@
 
     <!-- Custom CSS -->
     <style>
-        /* Base Setup */
         body {
-            background-color: #030305;
-            color: #E2E8F0;
+            background-color: #f8fafc;
+            /* slate-50 */
+            color: #334155;
+            /* slate-700 */
             overflow-x: hidden;
-            cursor: none;
-            /* Hide default cursor for custom one */
-        }
-
-        /* Noise Texture Overlay */
-        .noise {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 50;
-            opacity: 0.04;
-            background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
-        }
-
-        /* Custom Cursor */
-        .cursor-dot {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 8px;
-            height: 8px;
-            background: #00F0FF;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 100;
-            transform: translate(-50%, -50%);
-            mix-blend-mode: difference;
-        }
-
-        .cursor-ring {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(0, 240, 255, 0.5);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 99;
-            transform: translate(-50%, -50%);
-            transition: width 0.2s, height 0.2s, border-color 0.2s;
-        }
-
-        .cursor-hover .cursor-ring {
-            width: 60px;
-            height: 60px;
-            border-color: #7000FF;
-            background: rgba(112, 0, 255, 0.1);
-        }
-
-        @media (pointer: coarse) {
-            body {
-                cursor: auto;
-            }
-
-            .cursor-dot,
-            .cursor-ring {
-                display: none;
-            }
-        }
-
-        /* Border Beam Animation */
-        .border-beam {
-            position: relative;
-            background: #0d0d14;
-            border-radius: 1rem;
-            z-index: 1;
-        }
-
-        .border-beam::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: 1.1rem;
-            background: conic-gradient(from 0deg, transparent 70%, #00F0FF 80%, #7000FF 100%);
-            z-index: -1;
-            animation: spin 4s linear infinite;
-        }
-
-        .border-beam::after {
-            content: '';
-            position: absolute;
-            inset: 1px;
-            background: #0d0d14;
-            border-radius: 1rem;
-            z-index: -1;
-        }
-
-        @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Glassmorphism utilities */
-        .glass {
-            background: rgba(13, 13, 20, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* Text Gradient Glow */
-        .text-glow-cyan {
-            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
-        }
-
-        .text-gradient {
-            background: linear-gradient(to right, #00F0FF, #7000FF);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         /* ThreeJS Canvas */
         #webgl-container {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             z-index: 0;
             pointer-events: none;
-        }
-
-        /* Logo Fix for Dark Mode */
-        .logo-img {
-            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6)) brightness(1.2);
         }
 
         /* Scrollbar */
@@ -191,615 +62,484 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #030305;
+            background: #f8fafc;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #7000FF;
+            background: #cbd5e1;
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #00F0FF;
+            background: #94a3b8;
         }
     </style>
 </head>
 
-<body class="antialiased selection:bg-cyan selection:text-dark">
+<body class="antialiased selection:bg-slate-200">
 
-    <!-- Global Elements -->
-    <div class="noise"></div>
-    <div class="cursor-dot"></div>
-    <div class="cursor-ring"></div>
+    <div id="webgl-container"></div>
 
-    <!-- Navigation -->
-    <nav class="fixed w-full z-40 transition-all duration-300 glass" id="navbar">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
+    <!-- Main Overlay Layer -->
+    <div class="relative z-10 min-h-screen">
+
+        <!-- Navigation -->
+        <nav class="fixed top-8 left-1/2 transform -translate-x-1/2 z-40 transition-all duration-300 w-full max-w-5xl px-4"
+            id="navbar">
+            <div
+                class="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-full px-6 py-3 shadow-lg flex items-center justify-between">
                 <div class="flex-shrink-0 cursor-pointer magnetic-target" onclick="window.scrollTo(0,0)">
-                    <!-- Uploaded Logo with CSS adjustments for dark background -->
                     <img src="Pineo_logo-removebg-preview.png" alt="Pineo Logo"
-                        class="h-12 md:h-16 w-auto logo-img object-contain"
-                        onerror="this.outerHTML='<span class=\'text-2xl font-orbitron font-bold text-white tracking-widest\'>PIN<span class=\'text-cyan\'>E</span>O</span>'">
+                        class="h-10 md:h-12 w-auto object-contain"
+                        onerror="this.outerHTML='<span class=\'text-2xl font-orbitron font-bold text-slate-800 tracking-widest\'>PIN<span class=\'text-slate-500\'>E</span>O</span>'">
                 </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-8">
-                        <a href="#services"
-                            class="hover:text-cyan transition-colors px-3 py-2 rounded-md text-sm font-medium magnetic-target">解決方案</a>
-                        <a href="#grandpa-buffet"
-                            class="hover:text-cyan transition-colors px-3 py-2 rounded-md text-sm font-medium magnetic-target">產品服務</a>
-                        <a href="#about"
-                            class="hover:text-cyan transition-colors px-3 py-2 rounded-md text-sm font-medium magnetic-target">關於衡策</a>
-                    </div>
-                </div>
-                <div class="hidden md:block">
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="#services"
+                        class="text-sm px-3 py-1 rounded-full text-slate-600 hover:text-slate-800 transition-colors font-medium magnetic-target">解決方案</a>
+                    <a href="#about"
+                        class="text-sm px-3 py-1 rounded-full text-slate-600 hover:text-slate-800 transition-colors font-medium magnetic-target">關於衡策</a>
                     <a href="#contact"
-                        class="magnetic-target inline-flex items-center justify-center px-6 py-2 border border-cyan text-sm font-medium rounded-full text-cyan hover:bg-cyan hover:text-dark transition-all shadow-[0_0_15px_rgba(0,240,255,0.3)] hover:shadow-[0_0_25px_rgba(0,240,255,0.6)]">
-                        聯絡技術顧問
-                    </a>
+                        class="text-sm px-3 py-1 rounded-full bg-slate-800 text-white border border-slate-300 transition-colors font-medium magnetic-target">聯絡技術顧問</a>
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        <div id="webgl-container"></div>
-
-        <!-- Radial Gradient Mask to ensure text readability -->
-        <div class="absolute inset-0 bg-gradient-radial from-transparent via-dark/80 to-dark z-0"></div>
-
-        <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center flex flex-col items-center">
-            <div
-                class="inline-block mb-6 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm gsap-hero">
-                <span class="text-sm font-medium text-cyan flex items-center gap-2">
-                    AI 資訊軟體與數據分析系統開發
-                </span>
-            </div>
-
-            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 gsap-hero leading-tight">
-                駕馭複雜數據<br />
-                為百業帶來<span class="text-gradient text-glow-cyan">簡單解答</span>
-            </h1>
-
-            <p class="mt-4 max-w-2xl text-lg md:text-xl text-gray-400 mb-10 gsap-hero">
-                我們打破科技產業框架，透過人工智慧與資料分析技術，為中大型企業、個人工作室及非軟體產業，打造<strong class="text-white">高效率、極度防呆</strong>的專屬資訊工具。
-            </p>
-
-            <div class="flex flex-col sm:flex-row gap-4 justify-center gsap-hero w-full sm:w-auto">
-                <a href="#services"
-                    class="magnetic-target group relative inline-flex items-center justify-center px-8 py-4 text-base font-bold text-dark bg-cyan rounded-full overflow-hidden transition-all hover:scale-105 shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:shadow-[0_0_40px_rgba(0,240,255,0.8)]">
-                    <span
-                        class="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
-                    <span class="relative flex items-center gap-2">
-                        探索我們的 AI 開發服務
-                        <iconify-icon icon="mdi:arrow-right"
-                            class="text-xl group-hover:translate-x-1 transition-transform"></iconify-icon>
-                    </span>
-                </a>
-                <a href="#grandpa-buffet"
-                    class="magnetic-target inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white border border-white/20 rounded-full hover:bg-white/5 transition-all glass">
-                    了解自有產品 Grandpa Buffet
-                </a>
-            </div>
-        </div>
-
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-50 gsap-hero">
-            <span class="text-xs tracking-[0.2em] mb-2 font-orbitron">SCROLL</span>
-            <div class="w-[1px] h-12 bg-gradient-to-b from-cyan to-transparent"></div>
-        </div>
-    </section>
-
-    <!-- Why Us (Core Values) Section -->
-    <section class="py-24 relative z-10 bg-dark">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16 gsap-fade-up">
-                <h2 class="text-cyan font-orbitron tracking-widest text-sm mb-3">WHY CHOOSE PINEO</h2>
-                <h3 class="text-3xl md:text-4xl font-bold mb-6">讓 AI 走入日常<br />成為你最直覺的超級助理</h3>
-                <p class="text-gray-400">
-                    在資訊快速成長的時代，AI 不該是冷冰冰的艱澀技術。我們以數據驅動為基礎，開發真正能提升效率並創造價值的工具。
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Value Card 1 -->
-                <div class="border-beam p-8 gsap-fade-up flex flex-col relative group overflow-hidden">
-                    <div class="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-500 bg-cover bg-center mix-blend-overlay"
-                        style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80')">
-                    </div>
-                    <div class="relative z-10">
-                        <div
-                            class="w-14 h-14 rounded-full bg-cyan/10 flex items-center justify-center mb-6 text-cyan shadow-[0_0_15px_rgba(0,240,255,0.2)]">
-                            <iconify-icon icon="mdi:magic-staff" class="text-3xl"></iconify-icon>
-                        </div>
-                        <h4 class="text-xl font-bold text-white mb-3">化繁為簡</h4>
-                        <p class="text-gray-400 text-sm leading-relaxed">
-                            將複雜的數據變得清晰、易於理解且具有價值。我們擅長過濾雜訊，為您提煉出最核心的決策依據。
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Value Card 2 -->
-                <div class="border-beam p-8 gsap-fade-up flex flex-col relative group overflow-hidden"
-                    style="animation-delay: 0.2s;">
-                    <div class="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-500 bg-cover bg-center mix-blend-overlay"
-                        style="background-image: url('https://images.unsplash.com/photo-1555949963-aa79dcee57d5?auto=format&fit=crop&w=800&q=80')">
-                    </div>
-                    <div class="relative z-10">
-                        <div
-                            class="w-14 h-14 rounded-full bg-purple/10 flex items-center justify-center mb-6 text-purple shadow-[0_0_15px_rgba(112,0,255,0.2)]">
-                            <iconify-icon icon="mdi:shield-check-outline" class="text-3xl"></iconify-icon>
-                        </div>
-                        <h4 class="text-xl font-bold text-white mb-3">極度防呆</h4>
-                        <p class="text-gray-400 text-sm leading-relaxed">
-                            打造可靠且有效的資訊分析系統，將艱澀的參數轉化為直覺的「白話文標籤」，讓任何人都能輕鬆上手。
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Value Card 3 -->
-                <div class="border-beam p-8 gsap-fade-up flex flex-col relative group overflow-hidden"
-                    style="animation-delay: 0.4s;">
-                    <div class="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-500 bg-cover bg-center mix-blend-overlay"
-                        style="background-image: url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=800&q=80')">
-                    </div>
-                    <div class="relative z-10">
-                        <div
-                            class="w-14 h-14 rounded-full bg-magenta/10 flex items-center justify-center mb-6 text-magenta shadow-[0_0_15px_rgba(255,0,85,0.2)]">
-                            <iconify-icon icon="mdi:chart-timeline-variant-shimmer" class="text-3xl"></iconify-icon>
-                        </div>
-                        <h4 class="text-xl font-bold text-white mb-3">數據驅動</h4>
-                        <p class="text-gray-400 text-sm leading-relaxed">
-                            重視技術累積與產品品質。我們專注開發真正能提升效率的工具，建立長期穩定的企業發展基礎。
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Services Section -->
-    <section id="services" class="py-24 relative z-10 bg-surface border-y border-white/5">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <div class="gsap-fade-right">
-                    <h2 class="text-3xl md:text-5xl font-bold mb-6">打破產業框架<br /><span class="text-cyan">打造專屬 AI
-                            賦能系統</span></h2>
-                    <p class="text-gray-400 mb-8 text-lg">
-                        Pineo 不僅開發自有軟體，更將強大的研發能量注入百業。無論您是中大型企業、個人工作室，或美容、寵物等非軟體產業，我們都能為您量身打造。
-                    </p>
-                    <div class="space-y-6">
-                        <div
-                            class="flex gap-4 items-start p-4 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/10">
-                            <div class="mt-1 text-cyan"><iconify-icon icon="mdi:code-braces"
-                                    class="text-2xl"></iconify-icon></div>
-                            <div>
-                                <h4 class="text-lg font-bold text-white">AI 資訊軟體開發</h4>
-                                <p class="text-sm text-gray-500 mt-1">為不同規模客戶量身打造結合人工智慧與資料分析技術的資訊系統與應用軟體。</p>
-                            </div>
-                        </div>
-                        <div
-                            class="flex gap-4 items-start p-4 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/10">
-                            <div class="mt-1 text-purple"><iconify-icon icon="mdi:database-search-outline"
-                                    class="text-2xl"></iconify-icon></div>
-                            <div>
-                                <h4 class="text-lg font-bold text-white">數據分析與資訊整合</h4>
-                                <p class="text-sm text-gray-500 mt-1">整合多來源資料，建立系統化的管理工具，讓您的營運決策不再憑感覺。</p>
-                            </div>
-                        </div>
-                        <div
-                            class="flex gap-4 items-start p-4 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/10">
-                            <div class="mt-1 text-magenta"><iconify-icon icon="mdi:brain"
-                                    class="text-2xl"></iconify-icon></div>
-                            <div>
-                                <h4 class="text-lg font-bold text-white">AI 應用系統研發</h4>
-                                <p class="text-sm text-gray-500 mt-1">持續投入 AI 與資訊科技研發，開發各類智慧化資訊工具，輔助最佳決策。</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-10">
-                        <a href="#contact"
-                            class="magnetic-target inline-flex items-center gap-2 text-cyan font-bold hover:text-white transition-colors group">
-                            與我們的技術顧問聊聊您的點子
-                            <iconify-icon icon="mdi:arrow-right"
-                                class="group-hover:translate-x-2 transition-transform"></iconify-icon>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="relative gsap-fade-left">
-                    <div
-                        class="aspect-square rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] bg-gradient-to-tr from-cyan/20 to-purple/20 blur-[100px] -z-10">
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1000&q=80"
-                        alt="Global Data Network" class="rounded-2xl border border-white/10 shadow-2xl shadow-cyan/10">
-
-                    <!-- Floating Tech Elements -->
-                    <div class="absolute -bottom-6 -left-6 glass p-4 rounded-xl shadow-xl flex items-center gap-4 animate-bounce"
-                        style="animation-duration: 4s;">
-                        <iconify-icon icon="mdi:check-decagram" class="text-3xl text-cyan"></iconify-icon>
-                        <div>
-                            <div class="text-xs text-gray-400">System Status</div>
-                            <div class="font-bold text-white font-orbitron">100% OPTIMIZED</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Product Showcase: Grandpa Buffet -->
-    <section id="grandpa-buffet" class="py-32 relative z-10 bg-dark overflow-hidden">
-        <!-- Abstract glowing background -->
-        <div
-            class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-purple/10 to-transparent pointer-events-none">
-        </div>
-
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative">
-            <div class="text-center mb-16 gsap-fade-up">
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center pt-20 px-4 z-10">
+            <div class="relative w-full max-w-2xl mx-auto">
                 <div
-                    class="inline-flex items-center justify-center px-3 py-1 mb-4 rounded-full border border-purple/30 bg-purple/10 text-purple text-xs font-bold tracking-widest font-orbitron">
-                    OUR FIRST PRODUCT
-                </div>
-                <h2 class="text-4xl md:text-5xl font-bold mb-4">第一款自有產品<br /><span
-                        class="text-transparent bg-clip-text bg-gradient-to-r from-purple to-cyan">Grandpa Buffet</span>
-                </h2>
-                <p class="text-gray-400 max-w-2xl mx-auto text-lg">
-                    「化繁為簡」的最佳證明。為台灣股票市場打造的資訊分析工具，讓數據更清晰，<br />決策更有效率。
-                </p>
-            </div>
-
-            <div class="glass border-beam p-1 rounded-2xl max-w-5xl mx-auto relative overflow-hidden gsap-scale-up">
-                <!-- Inner Dashboard Mockup -->
-                <div class="bg-surface rounded-xl p-8 relative z-10">
-                    <div class="flex justify-between items-center border-b border-white/10 pb-6 mb-8">
-                        <div>
-                            <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                                <iconify-icon icon="mdi:finance" class="text-cyan"></iconify-icon>
-                                極簡分析儀表板
-                            </h3>
-                            <p class="text-xs text-gray-500 mt-1">免學 EMA, MACD, OBV，背後由 AI 自動運算 5 大核心指標。</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
-                            <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                            <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                        <!-- Score Visualizer -->
-                        <div
-                            class="flex flex-col items-center justify-center p-8 border border-white/5 rounded-2xl bg-gradient-to-b from-white/5 to-transparent relative">
-                            <div class="absolute inset-0 bg-radial-gradient from-cyan/10 to-transparent opacity-50">
-                            </div>
-                            <p class="text-gray-400 font-medium mb-4 z-10">趨勢續航分數 (0-100)</p>
-                            <div class="relative w-48 h-48 flex items-center justify-center z-10">
-                                <!-- SVG Circle Progress -->
-                                <svg class="w-full h-full -rotate-90 drop-shadow-[0_0_10px_rgba(0,240,255,0.5)]"
-                                    viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#1a1a24" stroke-width="8">
-                                    </circle>
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#00F0FF" stroke-width="8"
-                                        stroke-dasharray="283" stroke-dashoffset="283" class="score-circle"
-                                        stroke-linecap="round"></circle>
-                                </svg>
-                                <div class="absolute flex flex-col items-center">
-                                    <span class="text-5xl font-orbitron font-bold text-white score-val">0</span>
-                                    <span class="text-xs text-cyan mt-1">/ 100</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Info & Signals -->
-                        <div class="space-y-8">
-                            <div>
-                                <h4 class="text-lg font-bold text-white mb-2">一秒看懂的防呆訊號</h4>
-                                <p class="text-sm text-gray-400 mb-4">我們將錯綜複雜的線圖，直接翻譯成白話文標籤，任何人都能一眼看懂當下局勢。</p>
-                                <div class="flex flex-wrap gap-3">
-                                    <div
-                                        class="px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 font-bold text-sm flex items-center gap-2">
-                                        <iconify-icon icon="mdi:trending-up"></iconify-icon>
-                                        STRONG_UPTREND 強勢多頭
-                                    </div>
-                                    <div
-                                        class="px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 font-bold text-sm flex items-center gap-2 opacity-50">
-                                        <iconify-icon icon="mdi:trending-down"></iconify-icon>
-                                        BEARISH 空頭
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="pt-6 border-t border-white/10">
-                                <p class="text-sm text-gray-400 italic mb-6">
-                                    "能將最混沌的金融市場化繁為簡，我們同樣能為您的產業打造最直覺的資訊系統。"
-                                </p>
-                                <a href="#contact"
-                                    class="magnetic-target inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-dark bg-purple rounded-full hover:bg-white transition-all shadow-[0_0_15px_rgba(112,0,255,0.5)] w-full sm:w-auto">
-                                    體驗 Grandpa Buffet 極簡分析
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Us Section -->
-    <section id="about" class="py-32 relative z-10 bg-surface border-t border-white/5 overflow-hidden">
-        <!-- Abstract glowing background -->
-        <div
-            class="absolute top-1/2 right-0 w-1/3 h-1/2 bg-gradient-to-l from-cyan/10 to-transparent pointer-events-none blur-[120px] -translate-y-1/2">
-        </div>
-
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-24">
-                <div class="gsap-fade-right">
+                    class="relative backdrop-blur-xl bg-white/30 border border-slate-200/60 rounded-3xl p-8 md:p-12 shadow-2xl overflow-hidden">
                     <div
-                        class="inline-flex items-center justify-center px-3 py-1 mb-6 rounded-full border border-cyan/30 bg-cyan/10 text-cyan text-xs font-bold tracking-widest font-orbitron">
-                        ABOUT PINEO
+                        class="absolute inset-0 bg-gradient-to-br from-slate-50/80 to-transparent pointer-events-none -z-10">
                     </div>
-                    <h2 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                        從高雄出發<br />
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan to-purple">打造留住頂尖大腦的<br
-                                class="hidden md:block" /> AI 創新舞台</span>
-                    </h2>
-                    <div class="space-y-6 text-gray-400 text-lg leading-relaxed mb-10">
-                        <p>
-                            衡策資訊（Pineo）成立於高雄，是一家專注於 AI
-                            資訊軟體研發與數據分析系統開發的科技公司。我們深知，這座城市從來都不缺優秀的科技人才，缺的是一個能讓專業徹底發揮、被真正尊重的舞台。
+
+                    <div class="relative z-10 text-center flex flex-col items-center">
+                        <div
+                            class="inline-block mb-8 px-4 py-1.5 rounded-full border border-slate-200 bg-white/50 backdrop-blur-sm gsap-hero">
+                            <span class="text-sm font-medium text-slate-600 flex items-center gap-2">
+                                現代軟體與數據分析系統開發
+                            </span>
+                        </div>
+
+                        <h1
+                            class="text-4xl md:text-5xl lg:text-6xl font-light text-slate-800 mb-8 gsap-hero tracking-wide leading-tight">
+                            駕馭複雜<span class="font-semibold text-slate-900">數據</span><br />
+                            為百業帶來簡單解答
+                        </h1>
+
+                        <p class="text-slate-600 text-base md:text-lg leading-relaxed mb-10 gsap-hero max-w-lg">
+                            我們打破科技產業框架，透過人工智慧與資料分析技術，為中大型企業、個人工作室及非軟體產業，打造<strong
+                                class="text-slate-800 font-medium">高效率、極度防呆</strong>的專屬資訊工具。
                         </p>
-                        <p>
-                            看過太多因專業未獲重視而導致的人才外流，我們決定在這裡扎根，建立一個重視技術累積與產品品質的長期穩定發展基礎。我們將南台灣的研發能量聚集起來，讓優秀的工程師與分析師能專注於熱愛的事物，聯手將複雜的技術、數據轉化為推動百業成長的簡單解答。
-                        </p>
+
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center gsap-hero w-full sm:w-auto">
+                            <a href="#services"
+                                class="h-12 px-8 inline-flex items-center justify-center bg-slate-500 hover:bg-slate-700 text-white font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-1 shadow-slate-500/25">
+                                探索我們的設計服務
+                                <iconify-icon icon="mdi:arrow-right" class="ml-2 text-xl"></iconify-icon>
+                            </a>
+                        </div>
                     </div>
 
-                    <div class="p-6 glass rounded-2xl border-l-4 border-cyan relative overflow-hidden group">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                        </div>
-                        <h4 class="text-xl font-bold text-white mb-2 relative z-10 flex items-center gap-2">
-                            <iconify-icon icon="mdi:eye-outline" class="text-cyan"></iconify-icon>
-                            我們的願景
-                        </h4>
-                        <p class="text-sm text-gray-300 relative z-10">
-                            成為 AI 資訊軟體領域中具影響力的科技公司，透過人工智慧與數據分析技術，打造人人皆可輕鬆駕馭的智能引擎，成為百業成長的最強後盾。
-                        </p>
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20 pointer-events-none -z-10">
                     </div>
                 </div>
 
-                <div class="relative gsap-fade-left h-full flex flex-col justify-center">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 relative">
-                        <!-- DNA Card -->
-                        <div
-                            class="glass p-8 rounded-2xl border border-white/5 hover:border-purple/30 transition-all duration-300 group flex flex-col justify-between transform hover:-translate-y-2 h-full">
-                            <div>
-                                <div
-                                    class="w-12 h-12 rounded-full bg-purple/10 flex items-center justify-center mb-6 text-purple group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(112,0,255,0.2)]">
-                                    <iconify-icon icon="mdi:dna" class="text-2xl"></iconify-icon>
-                                </div>
-                                <h4 class="text-xl font-bold text-white mb-3">團隊 DNA</h4>
-                                <p class="text-sm text-gray-400">
-                                    <strong class="text-cyan font-medium block mb-2">自由與責任，讓高科技真正落地。</strong>
-                                    我們是一群投入自動化系統研究的專業工程師。推崇「自由與責任」的企業文化，致力於將人工智慧技術實際落地於日常。
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Promise Card -->
-                        <div
-                            class="glass p-8 rounded-2xl border border-white/5 hover:border-magenta/30 transition-all duration-300 group flex flex-col justify-between sm:translate-y-12 transform hover:-translate-y-2 h-full">
-                            <div>
-                                <div
-                                    class="w-12 h-12 rounded-full bg-magenta/10 flex items-center justify-center mb-6 text-magenta group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(255,0,85,0.2)]">
-                                    <iconify-icon icon="mdi:handshake-outline" class="text-2xl"></iconify-icon>
-                                </div>
-                                <h4 class="text-xl font-bold text-white mb-3">我們的承諾</h4>
-                                <p class="text-sm text-gray-400">
-                                    <strong class="text-cyan font-medium block mb-2">消弭資訊落差，便利日常生活。</strong>
-                                    科技不該是高牆。您只需專注於熱愛的事業，我們負責將複雜技術運算留在後台，把最直覺、便利的系統交到您手上。
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                <div
+                    class="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-200/20 to-emerald-200/20 blur-xl scale-110 -z-20">
                 </div>
             </div>
 
-            <!-- Core Values -->
-            <div class="mt-20 pt-16 border-t border-white/5 gsap-fade-up">
-                <div class="text-center mb-12">
-                    <h3 class="text-2xl md:text-3xl font-bold text-white">企業核心理念</h3>
-                    <p class="text-gray-400 mt-4">我們堅守以下四大準則，為客戶創造最大價值</p>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Value 1 -->
-                    <div
-                        class="p-6 rounded-xl bg-dark/50 border border-white/5 hover:border-cyan/30 hover:bg-white/5 transition-all duration-300 group">
-                        <div
-                            class="w-10 h-10 rounded-full bg-cyan/10 flex items-center justify-center mb-4 text-cyan group-hover:scale-110 transition-transform">
-                            <iconify-icon icon="mdi:chart-bar" class="text-xl"></iconify-icon>
-                        </div>
-                        <h4 class="text-lg font-bold text-white mb-2">數據驅動</h4>
-                        <p class="text-sm text-gray-500">以數據為基礎，打造可靠且有效的資訊分析系統。</p>
-                    </div>
-                    <!-- Value 2 -->
-                    <div
-                        class="p-6 rounded-xl bg-dark/50 border border-white/5 hover:border-purple/30 hover:bg-white/5 transition-all duration-300 group">
-                        <div
-                            class="w-10 h-10 rounded-full bg-purple/10 flex items-center justify-center mb-4 text-purple group-hover:scale-110 transition-transform">
-                            <iconify-icon icon="mdi:lightbulb-on-outline" class="text-xl"></iconify-icon>
-                        </div>
-                        <h4 class="text-lg font-bold text-white mb-2">技術創新</h4>
-                        <p class="text-sm text-gray-500">持續投入 AI 與資訊科技研發，開發更智能的軟體產品。</p>
-                    </div>
-                    <!-- Value 3 -->
-                    <div
-                        class="p-6 rounded-xl bg-dark/50 border border-white/5 hover:border-magenta/30 hover:bg-white/5 transition-all duration-300 group">
-                        <div
-                            class="w-10 h-10 rounded-full bg-magenta/10 flex items-center justify-center mb-4 text-magenta group-hover:scale-110 transition-transform">
-                            <iconify-icon icon="mdi:target-arrow" class="text-xl"></iconify-icon>
-                        </div>
-                        <h4 class="text-lg font-bold text-white mb-2">實用導向</h4>
-                        <p class="text-sm text-gray-500">專注開發真正能提升效率並創造價值的工具。</p>
-                    </div>
-                    <!-- Value 4 -->
-                    <div
-                        class="p-6 rounded-xl bg-dark/50 border border-white/5 hover:border-blue-400/30 hover:bg-white/5 transition-all duration-300 group">
-                        <div
-                            class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-4 text-blue-400 group-hover:scale-110 transition-transform">
-                            <iconify-icon icon="mdi:infinity" class="text-xl"></iconify-icon>
-                        </div>
-                        <h4 class="text-lg font-bold text-white mb-2">長期價值</h4>
-                        <p class="text-sm text-gray-500">重視技術累積與產品品質，建立長期穩定的發展基礎。</p>
-                    </div>
-                </div>
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-50 gsap-hero">
+                <span class="text-xs tracking-[0.2em] mb-2 font-orbitron text-slate-500 uppercase">Scroll</span>
+                <div class="w-[1px] h-12 bg-gradient-to-b from-slate-400 to-transparent"></div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Contact & Footer Section -->
-    <section id="contact" class="relative z-10 bg-[#020203] pt-24 pb-12 border-t border-white/5">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20">
-                <div class="gsap-fade-right">
-                    <h2 class="text-4xl font-bold mb-4">準備好升級您的<br /><span
-                            class="text-cyan text-glow-cyan">資訊系統</span>了嗎？</h2>
-                    <p class="text-gray-400 mb-8 max-w-md">
-                        無論是需要客製化 AI 軟體開發，或是想了解更多關於 Grandpa Buffet 的資訊，我們都隨時準備好與您交流。
+        <!-- Why Us (Core Values) Section -->
+        <section class="py-24 relative z-10">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16 gsap-fade-up">
+                    <h2 class="text-slate-500 font-orbitron tracking-widest text-sm mb-3">WHY CHOOSE PINEO</h2>
+                    <h3 class="text-3xl md:text-4xl font-light text-slate-800 mb-6 font-semibold">
+                        讓科技走入日常<br />成為你最直覺的超級助理</h3>
+                    <p class="text-slate-600">
+                        在資訊快速成長的時代，先進技術不該是冷冰冰的艱澀名詞。我們以數據驅動為基礎，開發真正能提升效率並創造價值的工具。
                     </p>
+                </div>
 
-                    <div class="space-y-6 text-sm text-gray-300">
-                        <div class="flex items-start gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Value Card 1 -->
+                    <div
+                        class="backdrop-blur-xl bg-white/40 border border-slate-200/60 shadow-lg rounded-3xl p-8 gsap-fade-up flex flex-col relative group overflow-hidden">
+                        <div class="relative z-10">
                             <div
-                                class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 text-cyan">
-                                <iconify-icon icon="mdi:domain"></iconify-icon>
+                                class="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-6 text-emerald-600 border border-emerald-200 shadow-sm">
+                                <iconify-icon icon="mdi:magic-staff" class="text-3xl"></iconify-icon>
                             </div>
+                            <h4 class="text-xl font-semibold text-slate-800 mb-3">化繁為簡</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                將複雜的數據變得清晰、易於理解且具有價值。我們擅長過濾雜訊，為您提煉出最核心的決策依據。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Value Card 2 -->
+                    <div class="backdrop-blur-xl bg-white/40 border border-slate-200/60 shadow-lg rounded-3xl p-8 gsap-fade-up flex flex-col relative group overflow-hidden"
+                        style="animation-delay: 0.2s;">
+                        <div class="relative z-10">
+                            <div
+                                class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center mb-6 text-blue-600 border border-blue-200 shadow-sm">
+                                <iconify-icon icon="mdi:shield-check-outline" class="text-3xl"></iconify-icon>
+                            </div>
+                            <h4 class="text-xl font-semibold text-slate-800 mb-3">極度防呆</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                打造可靠且有效的資訊分析系統，將艱澀的參數轉化為直覺的「白話文標籤」，讓任何人都能輕鬆上手。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Value Card 3 -->
+                    <div class="backdrop-blur-xl bg-white/40 border border-slate-200/60 shadow-lg rounded-3xl p-8 gsap-fade-up flex flex-col relative group overflow-hidden"
+                        style="animation-delay: 0.4s;">
+                        <div class="relative z-10">
+                            <div
+                                class="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center mb-6 text-indigo-600 border border-indigo-200 shadow-sm">
+                                <iconify-icon icon="mdi:chart-timeline-variant-shimmer" class="text-3xl"></iconify-icon>
+                            </div>
+                            <h4 class="text-xl font-semibold text-slate-800 mb-3">數據驅動</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                重視技術累積與產品品質。我們專注開發真正能提升效率的工具，建立長期穩定的企業發展基礎。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="py-24 relative z-10">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div class="gsap-fade-right">
+                        <h2 class="text-3xl md:text-5xl font-light text-slate-800 mb-6 leading-tight">
+                            打破產業框架<br /><span class="font-bold text-slate-900">打造專屬智慧賦能系統</span>
+                        </h2>
+                        <p class="text-slate-600 mb-8 text-lg">
+                            Pineo 不僅開發自有軟體，更將強大的研發能量注入百業。無論您是中大型企業、個人工作室，或美容、寵物等非軟體產業，我們都能為您量身打造。
+                        </p>
+                        <div class="space-y-6">
+                            <div
+                                class="flex gap-4 items-start p-5 rounded-2xl bg-white/60 border border-slate-200/60 shadow-sm hover:shadow-md transition-all">
+                                <div class="mt-1 text-indigo-600"><iconify-icon icon="mdi:brain"
+                                        class="text-2xl"></iconify-icon></div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-slate-800">智能導入：企業級先進技術方案與治理</h4>
+                                    <p class="text-sm text-slate-600 mt-1">
+                                        在嚴守資安門檻與數據不出內網的前提下，我們協助企業活化私有知識庫。透過完善的合規審核降低模型幻覺風險，並結合 BI
+                                        商業智能看板與預測性分析，提供穩健的高階決策支援，確保每一項數位投資都能成為驅動業務穩定增長的長期基石。</p>
+                                </div>
+                            </div>
+                            <div
+                                class="flex gap-4 items-start p-5 rounded-2xl bg-white/60 border border-slate-200/60 shadow-sm hover:shadow-md transition-all">
+                                <div class="mt-1 text-blue-600"><iconify-icon icon="mdi:web"
+                                        class="text-2xl"></iconify-icon></div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-slate-800">網頁開發：守護品牌價值的長效基石</h4>
+                                    <p class="text-sm text-slate-600 mt-1">
+                                        我們專注於企業級網頁與長期營運平台的建置，將系統架構與商業擴張同步考量。開發全程遵循嚴謹開發規範以確保資安合規，並落實主管級程式碼審查。無論是面對龐大流量還是
+                                        SEO 權威建置，我們嚴格把關前端性能與後端容錯機制，杜絕未來的技術債。</p>
+                                </div>
+                            </div>
+                            <div
+                                class="flex gap-4 items-start p-5 rounded-2xl bg-white/60 border border-slate-200/60 shadow-sm hover:shadow-md transition-all">
+                                <div class="mt-1 text-emerald-600"><iconify-icon icon="mdi:application-cog"
+                                        class="text-2xl"></iconify-icon></div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-slate-800">軟體開發：高效能企業系統整合</h4>
+                                    <p class="text-sm text-slate-600 mt-1">系統不互通是企業最深層的痛點。我們擅長中台開發與系統現代化重構，徹底打通 ERP 與
+                                        CRM 之間的資訊孤島。針對高複雜度運算，提供私有化部署軟體，以嚴謹的工程規範與自動化測試，確保併發下的全時段穩定運行。</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-10">
+                            <a href="#contact"
+                                class="magnetic-target inline-flex items-center gap-2 text-slate-700 font-semibold hover:text-slate-900 transition-colors group">
+                                與我們的技術顧問聊聊您的點子
+                                <iconify-icon icon="mdi:arrow-right"
+                                    class="group-hover:translate-x-2 transition-transform"></iconify-icon>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="relative gsap-fade-left">
+                        <div
+                            class="aspect-square rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] bg-gradient-to-tr from-blue-100/50 to-emerald-100/50 blur-[100px] -z-10">
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1000&q=80"
+                            alt="Global Data Network" class="rounded-3xl border border-slate-200/60 shadow-2xl">
+
+                        <div class="absolute -bottom-6 -left-6 bg-white/80 backdrop-blur-md border border-slate-200/60 p-4 rounded-2xl shadow-xl flex items-center gap-4 animate-bounce"
+                            style="animation-duration: 4s;">
+                            <iconify-icon icon="mdi:check-decagram" class="text-3xl text-emerald-600"></iconify-icon>
                             <div>
-                                <p class="font-bold text-white text-base">衡策資訊有限公司 | Pineo</p>
-                                <p class="mt-1">推動 AI 技術在資訊服務領域的應用，讓分析變得簡單高效。</p>
+                                <div class="text-xs text-slate-500">System Status</div>
+                                <div class="font-bold text-slate-800 font-orbitron">100% OPTIMIZED</div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <div
-                                class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 text-cyan">
-                                <iconify-icon icon="mdi:identifier"></iconify-icon>
-                            </div>
-                            <p>統一編號：<span class="font-orbitron font-bold text-white tracking-widest">60321109</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Us Section -->
+        <section id="about" class="py-32 relative z-10 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 relative">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-24">
+                    <div class="gsap-fade-right">
+                        <div
+                            class="inline-flex items-center justify-center px-3 py-1 mb-6 rounded-full border border-slate-300 bg-white shadow-sm text-slate-600 text-xs font-bold tracking-widest font-orbitron">
+                            ABOUT PINEO
                         </div>
-                        <div class="flex items-center gap-4">
+                        <h2 class="text-4xl md:text-5xl font-light text-slate-800 mb-6 leading-tight">
+                            從高雄出發<br />
+                            <span class="font-bold text-slate-900">打造留住頂尖大腦的<br class="hidden md:block" /> 科技創新舞台</span>
+                        </h2>
+                        <div class="space-y-6 text-slate-600 text-lg leading-relaxed mb-10">
+                            <p>
+                                衡策資訊（Pineo）成立於高雄，是一家專注於智慧資訊軟體研發與數據分析系統開發的科技公司。我們深知，這座城市從來都不缺優秀的科技人才，缺的是一個能讓專業徹底發揮、被真正尊重的舞台。
+                            </p>
+                            <p>
+                                看過太多因專業未獲重視而導致的人才外流，我們決定在這裡扎根，建立一個重視技術累積與產品品質的長期穩定發展基礎。我們將南台灣的研發能量聚集起來，讓優秀的工程師與分析師能專注於熱愛的事物，聯手將複雜的技術、數據轉化為推動百業成長的簡單解答。
+                            </p>
+                        </div>
+
+                        <div
+                            class="p-6 bg-white border border-slate-200 shadow-md rounded-2xl border-l-4 border-l-blue-600 relative overflow-hidden group">
+                            <h4 class="text-xl font-semibold text-slate-800 mb-2 relative z-10 flex items-center gap-2">
+                                <iconify-icon icon="mdi:eye-outline" class="text-blue-600"></iconify-icon>
+                                我們的願景
+                            </h4>
+                            <p class="text-sm text-slate-600 relative z-10">
+                                成為資訊軟體領域中具影響力的科技公司，透過人工智慧與數據分析技術，打造人人皆可輕鬆駕馭的智能引擎，成為百業成長的最強後盾。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="relative gsap-fade-left h-full flex flex-col justify-center">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 relative">
+                            <!-- DNA Card -->
                             <div
-                                class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 text-cyan">
-                                <iconify-icon icon="mdi:map-marker-outline"></iconify-icon>
+                                class="bg-white/60 backdrop-blur-md p-8 rounded-3xl border border-slate-200/60 shadow-lg hover:shadow-xl transition-all duration-300 group flex flex-col justify-between transform hover:-translate-y-2 h-full">
+                                <div>
+                                    <div
+                                        class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-6 text-slate-700 border border-slate-200 group-hover:scale-110 transition-transform">
+                                        <iconify-icon icon="mdi:dna" class="text-2xl"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-xl font-semibold text-slate-800 mb-3">團隊 DNA</h4>
+                                    <p class="text-sm text-slate-600">
+                                        <strong class="text-slate-800 font-medium block mb-2">自由與責任，讓高科技真正落地。</strong>
+                                        我們是一群投入自動化系統研究的專業工程師。推崇「自由與責任」的企業文化，致力於將人工智慧技術實際落地於日常。
+                                    </p>
+                                </div>
                             </div>
-                            <p>高雄市左營區重信路 608 號 2 樓</p>
+
+                            <!-- Promise Card -->
+                            <div
+                                class="bg-white/60 backdrop-blur-md p-8 rounded-3xl border border-slate-200/60 shadow-lg hover:shadow-xl transition-all duration-300 group flex flex-col justify-between sm:translate-y-12 transform hover:-translate-y-2 h-full">
+                                <div>
+                                    <div
+                                        class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-6 text-slate-700 border border-slate-200 group-hover:scale-110 transition-transform">
+                                        <iconify-icon icon="mdi:handshake-outline" class="text-2xl"></iconify-icon>
+                                    </div>
+                                    <h4 class="text-xl font-semibold text-slate-800 mb-3">我們的承諾</h4>
+                                    <p class="text-sm text-slate-600">
+                                        <strong class="text-slate-800 font-medium block mb-2">消弭資訊落差，便利日常生活。</strong>
+                                        科技不該是高牆。您只需專注於熱愛的事業，我們負責將複雜技術運算留在後台，把最直覺、便利的系統交到您手上。
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="gsap-fade-left">
-                    <!-- Contact Form (Google Forms Integration setup) -->
-                    <!-- TODO: Replace the ACTION_URL with your Google Form URL -->
-                    <form id="contact-form" class="glass p-8 rounded-2xl border border-white/10 relative">
-                        <h3 class="text-xl font-bold text-white mb-6">告訴我們您的需求</h3>
-
-                        <!-- Success Message Overlay (Hidden by default) -->
-                        <div id="form-success"
-                            class="absolute inset-0 bg-surface/95 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center z-10 hidden opacity-0 transition-opacity duration-300">
+                <!-- Core Values -->
+                <div class="mt-20 pt-16 border-t border-slate-200 gsap-fade-up">
+                    <div class="text-center mb-12">
+                        <h3 class="text-2xl md:text-3xl font-light text-slate-800 font-semibold">企業核心理念</h3>
+                        <p class="text-slate-600 mt-4">我們堅守以下四大準則，為客戶創造最大價值</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div
+                            class="p-6 rounded-2xl bg-white/40 border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300">
                             <div
-                                class="w-16 h-16 rounded-full bg-cyan/20 flex items-center justify-center text-cyan mb-4 animate-bounce">
-                                <iconify-icon icon="mdi:check-bold" class="text-3xl"></iconify-icon>
+                                class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mb-4 text-emerald-600 border border-emerald-200">
+                                <iconify-icon icon="mdi:chart-bar" class="text-xl"></iconify-icon>
                             </div>
-                            <h4 class="text-xl font-bold text-white mb-2">已成功送出！</h4>
-                            <p class="text-sm text-gray-400 text-center px-6">感謝您的來信，我們的技術顧問會盡快與您聯繫。</p>
-                            <button type="button" onclick="resetForm()"
-                                class="mt-6 px-6 py-2 border border-white/20 rounded-full text-sm text-white hover:bg-white/10 transition-colors">
-                                關閉
-                            </button>
+                            <h4 class="text-lg font-semibold text-slate-800 mb-2">數據驅動</h4>
+                            <p class="text-sm text-slate-600">以數據為基礎，打造可靠且有效的資訊分析系統。</p>
                         </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-400 mb-1">姓名 / 稱呼 <span
-                                        class="text-magenta">*</span></label>
-                                <!-- TODO: Replace 'entry.XXXXXX' with your actual Google Form entry ID for Name -->
-                                <input type="text" id="name" name="entry.1249217521" required
-                                    class="w-full bg-dark/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan transition-colors"
-                                    placeholder="How should we call you?">
+                        <div
+                            class="p-6 rounded-2xl bg-white/40 border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300">
+                            <div
+                                class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mb-4 text-blue-600 border border-blue-200">
+                                <iconify-icon icon="mdi:lightbulb-on-outline" class="text-xl"></iconify-icon>
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-400 mb-1">聯絡信箱 <span
-                                        class="text-magenta">*</span></label>
-                                <!-- TODO: Replace 'entry.YYYYYY' with your actual Google Form entry ID for Email -->
-                                <input type="email" id="email" name="entry.632000532" required
-                                    class="w-full bg-dark/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan transition-colors"
-                                    placeholder="your@email.com">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-400 mb-1">需求簡述 <span
-                                        class="text-magenta">*</span></label>
-                                <!-- TODO: Replace 'entry.ZZZZZZ' with your actual Google Form entry ID for Message -->
-                                <textarea rows="4" id="message" name="entry.1257505161" required
-                                    class="w-full bg-dark/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan transition-colors resize-none"
-                                    placeholder="我想了解客製化 AI 開發..."></textarea>
-                            </div>
-                            <button type="submit" id="submit-btn"
-                                class="magnetic-target w-full flex items-center justify-center gap-2 bg-gradient-to-r from-cyan to-purple text-white font-bold py-4 rounded-lg hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                <span>填寫線上表單送出</span>
-                                <iconify-icon icon="mdi:send-outline" id="submit-icon"></iconify-icon>
-                            </button>
+                            <h4 class="text-lg font-semibold text-slate-800 mb-2">技術創新</h4>
+                            <p class="text-sm text-slate-600">持續投入先進自動化與資訊科技研發，開發更智能的軟體產品。</p>
                         </div>
-                    </form>
+                        <div
+                            class="p-6 rounded-2xl bg-white/40 border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300">
+                            <div
+                                class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mb-4 text-indigo-600 border border-indigo-200">
+                                <iconify-icon icon="mdi:target-arrow" class="text-xl"></iconify-icon>
+                            </div>
+                            <h4 class="text-lg font-semibold text-slate-800 mb-2">實用導向</h4>
+                            <p class="text-sm text-slate-600">專注開發真正能提升效率並創造價值的工具。</p>
+                        </div>
+                        <div
+                            class="p-6 rounded-2xl bg-white/40 border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300">
+                            <div
+                                class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center mb-4 text-slate-700 border border-slate-300">
+                                <iconify-icon icon="mdi:infinity" class="text-xl"></iconify-icon>
+                            </div>
+                            <h4 class="text-lg font-semibold text-slate-800 mb-2">長期價值</h4>
+                            <p class="text-sm text-slate-600">重視技術累積與產品品質，建立長期穩定的發展基礎。</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div
-                class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500">
-                <div class="flex items-center gap-2 mb-4 md:mb-0">
-                    <img src="Pineo_logo-removebg-preview.png" alt="Pineo"
-                        class="h-8 md:h-10 w-auto logo-img grayscale opacity-50"
-                        onerror="this.outerHTML='<span class=\'font-orbitron font-bold\'>PINEO</span>'">
-                    <span>© 2026 Pineo. All Rights Reserved.</span>
+        <!-- Contact & Footer Section -->
+        <section id="contact"
+            class="relative z-10 pt-24 pb-12 border-t border-slate-200/60 bg-white/30 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20">
+                    <div class="gsap-fade-right">
+                        <h2 class="text-4xl font-light text-slate-800 mb-4 font-semibold">準備好升級您的<br /><span
+                                class="text-slate-900">資訊系統</span>了嗎？</h2>
+                        <p class="text-slate-600 mb-8 max-w-md">
+                            無論是需要客製化系統開發，或是想了解更多關於我們服務的資訊，我們都隨時準備好與您交流。
+                        </p>
+
+                        <div class="space-y-6 text-sm text-slate-600">
+                            <div class="flex items-start gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0 text-slate-600">
+                                    <iconify-icon icon="mdi:domain"></iconify-icon>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-slate-800 text-base">衡策資訊有限公司 | Pineo</p>
+                                    <p class="mt-1">推動先進技術在資訊服務領域的應用，讓分析變得簡單高效。</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0 text-slate-600">
+                                    <iconify-icon icon="mdi:identifier"></iconify-icon>
+                                </div>
+                                <p>統一編號：<span
+                                        class="font-orbitron font-bold text-slate-800 tracking-widest">60321109</span>
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0 text-slate-600">
+                                    <iconify-icon icon="mdi:map-marker-outline"></iconify-icon>
+                                </div>
+                                <p>高雄市左營區重信路 608 號 2 樓</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gsap-fade-left">
+                        <form id="contact-form"
+                            class="bg-white/60 backdrop-blur-md p-8 rounded-3xl border border-slate-200/60 shadow-xl relative">
+                            <h3 class="text-xl font-semibold text-slate-800 mb-6">告訴我們您的需求</h3>
+
+                            <div id="form-success"
+                                class="absolute inset-0 bg-white/95 backdrop-blur-md rounded-3xl flex flex-col items-center justify-center z-10 hidden opacity-0 transition-opacity duration-300 border border-slate-200/60">
+                                <div
+                                    class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-4 animate-bounce border border-emerald-200">
+                                    <iconify-icon icon="mdi:check-bold" class="text-3xl"></iconify-icon>
+                                </div>
+                                <h4 class="text-xl font-semibold text-slate-800 mb-2">已成功送出！</h4>
+                                <p class="text-sm text-slate-600 text-center px-6">感謝您的來信，我們的技術顧問會盡快與您聯繫。</p>
+                                <button type="button" onclick="resetForm()"
+                                    class="mt-6 px-6 py-2 border border-slate-300 rounded-full text-sm text-slate-600 hover:bg-slate-100 transition-colors">
+                                    關閉
+                                </button>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">姓名 / 稱呼 <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" id="name" name="entry.1249217521" required
+                                        class="flex h-12 w-full rounded-xl border border-slate-300 bg-white/60 px-4 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 backdrop-blur-sm"
+                                        placeholder="How should we call you?">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">聯絡信箱 <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="email" id="email" name="entry.632000532" required
+                                        class="flex h-12 w-full rounded-xl border border-slate-300 bg-white/60 px-4 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 backdrop-blur-sm"
+                                        placeholder="your@email.com">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">需求簡述 <span
+                                            class="text-red-500">*</span></label>
+                                    <textarea rows="4" id="message" name="entry.1257505161" required
+                                        class="flex w-full rounded-xl border border-slate-300 bg-white/60 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 backdrop-blur-sm resize-none"
+                                        placeholder="我想了解客製化軟體開發..."></textarea>
+                                </div>
+                                <button type="submit" id="submit-btn"
+                                    class="magnetic-target w-full flex items-center justify-center gap-2 bg-slate-500 hover:bg-slate-700 text-white font-medium py-4 rounded-xl hover:shadow-[0_0_20px_rgba(100,116,139,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span>填寫線上表單送出</span>
+                                    <iconify-icon icon="mdi:send-outline" id="submit-icon"></iconify-icon>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="flex gap-6">
-                    <a href="#" class="hover:text-cyan transition-colors">隱私權政策</a>
-                    <a href="#" class="hover:text-cyan transition-colors">服務條款</a>
+
+                <div
+                    class="border-t border-slate-200/60 pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500">
+                    <div class="flex items-center gap-2 mb-4 md:mb-0">
+                        <img src="Pineo_logo-removebg-preview.png" alt="Pineo"
+                            class="h-8 md:h-10 w-auto opacity-50 grayscale"
+                            onerror="this.outerHTML='<span class=\'font-orbitron font-bold text-slate-800\'>PINEO</span>'">
+                        <span>© 2026 Pineo. All Rights Reserved.</span>
+                    </div>
+                    <div class="flex gap-6">
+                        <a href="#" class="hover:text-slate-800 transition-colors">隱私權政策</a>
+                        <a href="#" class="hover:text-slate-800 transition-colors">服務條款</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+    </div>
 
     <!-- Scripts -->
     <script>
-        // 1. Custom Cursor Logic (Only active on fine pointer devices)
+        // 1. Navigation effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            const navInner = nav.querySelector('div');
+            if (window.scrollY > 50) {
+                navInner.classList.add('shadow-md', 'bg-white/95');
+                navInner.classList.remove('bg-white/80', 'shadow-lg');
+            } else {
+                navInner.classList.remove('shadow-md', 'bg-white/95');
+                navInner.classList.add('bg-white/80', 'shadow-lg');
+            }
+        });
+
+        // 2. Interactive buttons
         if (window.matchMedia("(pointer: fine)").matches) {
-            const cursorDot = document.querySelector('.cursor-dot');
-            const cursorRing = document.querySelector('.cursor-ring');
-
-            // Mouse follower
-            window.addEventListener('mousemove', (e) => {
-                // Instantly move dot
-                cursorDot.style.left = e.clientX + 'px';
-                cursorDot.style.top = e.clientY + 'px';
-
-                // Smoothly move ring
-                gsap.to(cursorRing, {
-                    x: e.clientX,
-                    y: e.clientY,
-                    duration: 0.15,
-                    ease: "power2.out"
-                });
-            });
-
-            // Add hover state to interactive elements
-            const interactives = document.querySelectorAll('a, button, .magnetic-target');
-            interactives.forEach(el => {
-                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-            });
-
-            // Magnetic Button Effect
             const magneticElements = document.querySelectorAll('.magnetic-target');
             magneticElements.forEach(elem => {
                 elem.addEventListener('mousemove', (e) => {
@@ -825,127 +565,192 @@
             });
         }
 
-        // 2. Navbar Blur & Shrink on Scroll
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                nav.classList.add('shadow-lg', 'bg-dark/80');
-                nav.classList.remove('glass');
-            } else {
-                nav.classList.remove('shadow-lg', 'bg-dark/80');
-                nav.classList.add('glass');
-            }
-        });
-
-        // 3. Three.js Particle Network Background (Tech Impact Style)
+        // 3. ThreeJS setup from prompt
         function initThreeJS() {
             const container = document.getElementById('webgl-container');
+            if (!container) return;
+
             const scene = new THREE.Scene();
 
-            // Add a subtle fog for depth
-            scene.fog = new THREE.FogExp2(0x030305, 0.002);
-
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 150;
+            camera.position.z = 7;
+            camera.position.y = -0.8;
+            camera.position.x = -1;
 
-            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            const renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true
+            });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setClearColor(0xf8fafc, 0);
             container.appendChild(renderer.domElement);
 
-            // Particles
-            const particlesGeometry = new THREE.BufferGeometry();
-            const particlesCount = window.innerWidth < 768 ? 200 : 500;
-            const posArray = new Float32Array(particlesCount * 3);
-            const colorsArray = new Float32Array(particlesCount * 3);
+            const curves = [
+                new THREE.QuadraticBezierCurve3(
+                    new THREE.Vector3(-15, -3, 0),
+                    new THREE.Vector3(0, 1, 0),
+                    new THREE.Vector3(12, -2, 0)
+                ),
+                new THREE.QuadraticBezierCurve3(
+                    new THREE.Vector3(-14, -2, 0),
+                    new THREE.Vector3(1, 2, 0),
+                    new THREE.Vector3(10, -1, 0)
+                ),
+                new THREE.QuadraticBezierCurve3(
+                    new THREE.Vector3(-16, -4, 0),
+                    new THREE.Vector3(-1, 0.5, 0),
+                    new THREE.Vector3(11, -3, 0)
+                )
+            ]
 
-            const colorCyan = new THREE.Color(0x00F0FF);
-            const colorPurple = new THREE.Color(0x7000FF);
+            const colors = [
+                new THREE.Color(0x88C1FF),
+                new THREE.Color(0xA0D2FF),
+                new THREE.Color(0x78B6FF),
+            ]
 
-            for (let i = 0; i < particlesCount * 3; i += 3) {
-                // Spread particles
-                posArray[i] = (Math.random() - 0.5) * 400; // x
-                posArray[i + 1] = (Math.random() - 0.5) * 400; // y
-                posArray[i + 2] = (Math.random() - 0.5) * 300; // z
+            const meshes = [];
 
-                // Mix colors
-                const mixedColor = colorCyan.clone().lerp(colorPurple, Math.random());
-                colorsArray[i] = mixedColor.r;
-                colorsArray[i + 1] = mixedColor.g;
-                colorsArray[i + 2] = mixedColor.b;
-            }
+            curves.forEach((curve, index) => {
+                const tubeGeometry = new THREE.TubeGeometry(curve, 200, index === 0 ? 0.8 : 0.6, 32, false)
 
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+                const vertexShader = `
+                  varying vec2 vUv;
+                  varying vec3 vPosition;
+                  
+                  void main() {
+                    vUv = uv;
+                    vPosition = position;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                  }
+                `;
 
-            const material = new THREE.PointsMaterial({
-                size: 1.5,
-                vertexColors: true,
+                const fragmentShader = `
+                  uniform float time;
+                  uniform vec3 color;
+                  varying vec2 vUv;
+                  varying vec3 vPosition;
+                  
+                  void main() {
+                    vec3 baseColor = color;
+                    float pulse = sin(time * 1.5) * 0.1 + 0.9;
+                    float gradient = smoothstep(0.0, 1.0, vUv.x);
+                    
+                    float glow = 1.0 - abs(vUv.y - 0.5) * 2.0;
+                    glow = pow(glow, 2.0);
+                    
+                    float fade = 1.0;
+                    if (vUv.x > 0.7) {
+                      fade = 1.0 - smoothstep(0.7, 1.0, vUv.x);
+                    } else if (vUv.x < 0.2) {
+                      fade = smoothstep(0.0, 0.2, vUv.x);
+                    }
+                    
+                    vec3 finalColor = baseColor * gradient * pulse * glow * fade * 0.8;
+                    
+                    gl_FragColor = vec4(finalColor, glow * fade * 0.6);
+                  }
+                `;
+
+                const material = new THREE.ShaderMaterial({
+                    vertexShader,
+                    fragmentShader,
+                    uniforms: {
+                        time: { value: 0 },
+                        color: { value: colors[index] }
+                    },
+                    transparent: true,
+                    blending: THREE.AdditiveBlending,
+                    side: THREE.DoubleSide,
+                });
+
+                const lightStreak = new THREE.Mesh(tubeGeometry, material);
+                lightStreak.rotation.z = index * 0.15;
+                scene.add(lightStreak);
+                meshes.push(lightStreak);
+            });
+
+            const backgroundGeometry = new THREE.PlaneGeometry(80, 55);
+            const backgroundMaterial = new THREE.ShaderMaterial({
+                vertexShader: `
+                  varying vec2 vUv;
+                  void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                  }
+                `,
+                fragmentShader: `
+                  varying vec2 vUv;
+                  uniform float time;
+                  
+                  void main() {
+                    vec3 blue1 = vec3(0.7, 0.85, 1.0);
+                    vec3 blue2 = vec3(0.6, 0.8, 1.0);
+                    vec3 blue3 = vec3(0.5, 0.75, 0.95);
+                    
+                    float timeFactor = sin(time * 0.2) * 0.05;
+                    
+                    vec3 color = mix(blue1, blue2, vUv.x + timeFactor);
+                    color = mix(color, blue3, vUv.x * 0.3 + timeFactor);
+                    
+                    float noise = fract(sin(dot(vUv, vec2(12.9898, 78.233))) * 43758.5453) * 0.05;
+                    float blur = smoothstep(0.0, 0.2, vUv.x) * (1.0 - smoothstep(0.8, 1.0, vUv.x));
+                    
+                    gl_FragColor = vec4(color + noise, 0.15 * blur);
+                  }
+                `,
+                uniforms: {
+                    time: { value: 0 }
+                },
                 transparent: true,
-                opacity: 0.8,
-                blending: THREE.AdditiveBlending
+                side: THREE.DoubleSide,
             });
 
-            const particlesMesh = new THREE.Points(particlesGeometry, material);
-            scene.add(particlesMesh);
+            const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
+            background.position.z = -5;
+            background.position.x = -2;
+            scene.add(background);
 
-            // Lines connecting particles (Network effect) - optional, keeping it simple for performance
-            // but for "Tech Impact" it's cool if we just rotate the cloud.
-
-            // Mouse interaction
-            let mouseX = 0;
-            let mouseY = 0;
-            let targetX = 0;
-            let targetY = 0;
-            const windowHalfX = window.innerWidth / 2;
-            const windowHalfY = window.innerHeight / 2;
-
-            document.addEventListener('mousemove', (event) => {
-                mouseX = (event.clientX - windowHalfX);
-                mouseY = (event.clientY - windowHalfY);
-            });
-
-            // Animation Loop
             const clock = new THREE.Clock();
+            let animationId;
 
-            function animate() {
-                requestAnimationFrame(animate);
-                const elapsedTime = clock.getElapsedTime();
+            const animate = () => {
+                animationId = requestAnimationFrame(animate);
+                const time = clock.getElapsedTime() * 1000 * 0.001;
 
-                // Rotate entire system slowly
-                particlesMesh.rotation.y = elapsedTime * 0.05;
-                particlesMesh.rotation.x = elapsedTime * 0.02;
+                scene.traverse((object) => {
+                    if (object instanceof THREE.Mesh && object.material instanceof THREE.ShaderMaterial) {
+                        if (object.material.uniforms.time) {
+                            object.material.uniforms.time.value = time;
+                        }
+                    }
+                });
 
-                // Mouse parallax interaction
-                targetX = mouseX * 0.001;
-                targetY = mouseY * 0.001;
-
-                particlesMesh.rotation.y += 0.05 * (targetX - particlesMesh.rotation.y);
-                particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
+                meshes.forEach((child, index) => {
+                    child.rotation.z = Math.sin(time * 0.1 + index * 0.5) * 0.05;
+                });
 
                 renderer.render(scene, camera);
-            }
+            };
 
             animate();
 
-            // Resize handler
-            window.addEventListener('resize', () => {
+            const handleResize = () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
-            });
+            };
+            window.addEventListener("resize", handleResize);
         }
 
-        // Wait for DOM to init Three.js
         window.onload = () => {
             initThreeJS();
 
-            // 4. GSAP Scroll Animations
+            // 4. GSAP Setup
             gsap.registerPlugin(ScrollTrigger);
 
-            // Hero Entrance
             gsap.from(".gsap-hero", {
-                y: 50,
+                y: 30,
                 opacity: 0,
                 duration: 1,
                 stagger: 0.15,
@@ -953,7 +758,6 @@
                 delay: 0.2
             });
 
-            // Fade Up Elements
             gsap.utils.toArray('.gsap-fade-up').forEach(elem => {
                 gsap.from(elem, {
                     scrollTrigger: {
@@ -967,7 +771,6 @@
                 });
             });
 
-            // Fade Left / Right
             gsap.utils.toArray('.gsap-fade-right').forEach(elem => {
                 gsap.from(elem, {
                     scrollTrigger: { trigger: elem, start: "top 80%" },
@@ -981,64 +784,23 @@
                 });
             });
 
-            // Scale Up (Grandpa Buffet Dashboard)
-            gsap.from(".gsap-scale-up", {
-                scrollTrigger: {
-                    trigger: ".gsap-scale-up",
-                    start: "top 85%"
-                },
-                scale: 0.9,
-                y: 50,
-                opacity: 0,
-                duration: 1,
-                ease: "power3.out"
-            });
-
-            // 5. Anime.js for the Grandpa Buffet Score
-            // Trigger animation when the section comes into view
-            ScrollTrigger.create({
-                trigger: "#grandpa-buffet",
-                start: "top 60%",
-                onEnter: () => {
-                    // Animate number
-                    anime({
-                        targets: '.score-val',
-                        innerHTML: [0, 96],
-                        round: 1,
-                        easing: 'easeOutExpo',
-                        duration: 2500,
-                    });
-
-                    // Animate SVG circle stroke
-                    anime({
-                        targets: '.score-circle',
-                        strokeDashoffset: [283, 283 - (283 * 0.96)], // 96%
-                        easing: 'easeOutQuart',
-                        duration: 2500,
-                        delay: 200
-                    });
-                },
-                once: true
-            });
-            // Google Form Submission Logic (Solution B)
+            // Contact form submit logic
             const form = document.getElementById('contact-form');
             if (form) {
                 form.addEventListener('submit', function (e) {
-                    e.preventDefault(); // Prevent default form redirect
+                    e.preventDefault();
 
                     const submitBtn = document.getElementById('submit-btn');
                     const submitIcon = document.getElementById('submit-icon');
 
-                    // TODO: Replace this URL with your actual Google Form 'formResponse' URL
+                    // TODO: Configure your Google Form URL
                     const googleFormActionURL = "https://docs.google.com/forms/u/0/d/e/1FAIpQLSe1fAeNnChtoxBoJJviPhhTWzLhqNaZ0t4QARH3trx-chgylg/formResponse";
 
-                    // Provide UI Feedback (Loading state)
                     submitBtn.disabled = true;
                     submitBtn.querySelector('span').innerText = '傳送中...';
                     submitIcon.setAttribute('icon', 'mdi:loading');
                     submitIcon.classList.add('animate-spin');
 
-                    // Gather Form Data
                     const formData = new FormData(form);
                     const searchParams = new URLSearchParams();
 
@@ -1046,25 +808,22 @@
                         searchParams.append(pair[0], pair[1]);
                     }
 
-                    // Send to Google Forms silently using 'no-cors' mode
                     fetch(googleFormActionURL, {
                         method: 'POST',
-                        mode: 'no-cors', // Critical: Prevents CORS errors but means we don't get a readable response
+                        mode: 'no-cors',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         },
                         body: searchParams
                     })
                         .then(() => {
-                            // In no-cors, we assume success if the fetch promise resolves
                             showSuccessMessage();
                         })
                         .catch(error => {
                             console.error('Error submitting form:', error);
-                            alert('傳送失敗，請稍後再試或直接聯絡我們。');
+                            alert('傳送失敗，請稍後再試。');
                         })
                         .finally(() => {
-                            // Reset button state
                             submitBtn.disabled = false;
                             submitBtn.querySelector('span').innerText = '填寫線上表單送出';
                             submitIcon.setAttribute('icon', 'mdi:send-outline');
@@ -1074,11 +833,9 @@
             }
         };
 
-        // Reset form UI after success
         function showSuccessMessage() {
             const successDiv = document.getElementById('form-success');
             successDiv.classList.remove('hidden');
-            // Slight delay for transition
             setTimeout(() => {
                 successDiv.classList.remove('opacity-0');
             }, 10);
